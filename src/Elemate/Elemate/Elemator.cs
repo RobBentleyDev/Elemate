@@ -25,16 +25,33 @@ namespace Elemate
                     + fileName
                     + "\"" + Environment.NewLine);
 
-                var fileContent = File.ReadAllText(fileName);
-                var xamlDocument = new XamlDocument(fileContent);
-
-                Console.ForegroundColor = ConsoleColor.Gray;
-
-                foreach (var xamlFragment in xamlDocument.Fragments())
-                {
-                    Console.Write(xamlFragment + Environment.NewLine);
-                }
+                AddNamesInFile(fileName);
             }
+        }
+
+        private void AddNamesInFile(string fileName)
+        {
+            var fileContent = File.ReadAllText(fileName);
+            var xamlDocument = new XamlDocument(fileContent);
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+
+            foreach (var xamlFragment in xamlDocument.Fragments())
+            {
+                AddNameInFragment(xamlFragment);
+            }
+        }
+
+        private void AddNameInFragment(XamlFragment xamlFragment)
+        {
+
+            if (xamlFragment.IsAttachedProperty()
+                || xamlFragment.HasNameAttribute())
+            {
+                return;
+            }
+
+            Console.Write(xamlFragment + Environment.NewLine);
         }
     }
 }

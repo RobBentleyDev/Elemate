@@ -35,5 +35,31 @@ namespace Elemate
         {
             return _xamlFragment;
         }
+
+        public bool IsAttachedProperty()
+        {
+            if (_xamlFragment.Contains(" "))
+            {
+                return false;
+            }
+
+            if (_xamlFragment.Contains("."))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool HasNameAttribute()
+        {
+            if(_xamlFragment.Contains("x:Name=")
+                || _xamlFragment.Contains("Name="))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
