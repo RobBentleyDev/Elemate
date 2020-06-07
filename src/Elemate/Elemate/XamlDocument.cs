@@ -65,5 +65,18 @@ namespace Elemate
         {
             return !Equals(left, right);
         }
+
+        public XamlDocument ReplaceFragment(XamlFragment originalXamlFragment, XamlFragment namedXamlFragment)
+        {
+            return new XamlDocument(
+                _xaml.ReplaceFirst(
+                    originalXamlFragment.ToString(),
+                    namedXamlFragment.ToString()));
+        }
+
+        public override string ToString()
+        {
+            return _xaml;
+        }
     }
 }

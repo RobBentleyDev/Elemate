@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace Elemate
 {
@@ -32,26 +33,48 @@ namespace Elemate
         private void AddNamesInFile(string fileName)
         {
             var fileContent = File.ReadAllText(fileName);
-            var xamlDocument = new XamlDocument(fileContent);
+            var originalXamlDocument = new XamlDocument(fileContent);
+            var newXamlDocument = new XamlDocument(fileContent);
 
             Console.ForegroundColor = ConsoleColor.Gray;
+            
+            var moduleAcronym = GenerateModuleAcronym(Path.GetFileName(fileName));
+            var namingStrategy = new SerialElementNamingStrategy(moduleAcronym);
+            
+            var fragmentsToName = originalXamlDocument
+                .Fragments()
+                .Where(fragment => !fragment.IsAttachedProperty()
+                                   && !fragment.HasNameAttribute());
 
-            foreach (var xamlFragment in xamlDocument.Fragments())
+            foreach (var xamlFragment in fragmentsToName)
             {
-                AddNameInFragment(xamlFragment);
+                var namedXamlFragment = AddNameToFragment(namingStrategy, xamlFragment);
+
+                newXamlDocument = newXamlDocument
+                    .ReplaceFragment(xamlFragment, namedXamlFragment);
+            }
+
+            if (newXamlDocument != originalXamlDocument)
+            {
+                File.WriteAllText(fileName, newXamlDocument.ToString());
             }
         }
 
-        private void AddNameInFragment(XamlFragment xamlFragment)
+        private XamlFragment AddNameToFragment(INamingStrategy namingStrategy, XamlFragment xamlFragment)
         {
+            var namedXamlFragment = namingStrategy.AddName(xamlFragment);
 
-            if (xamlFragment.IsAttachedProperty()
-                || xamlFragment.HasNameAttribute())
+            if (namedXamlFragment != xamlFragment)
             {
-                return;
+                Console.Write(namedXamlFragment + Environment.NewLine);
             }
 
-            Console.Write(xamlFragment + Environment.NewLine);
+            return namedXamlFragment;
+        }
+
+        private static string GenerateModuleAcronym(string fileName)
+        {
+            return string.Concat(fileName.Where(c => c >= 'A' && c <= 'Z'));
         }
     }
 }
