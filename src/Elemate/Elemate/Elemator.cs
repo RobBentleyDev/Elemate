@@ -30,7 +30,10 @@ namespace Elemate
 
                 Console.ForegroundColor = ConsoleColor.Gray;
 
-                Console.Write(xamlDocument + Environment.NewLine);
+                foreach (var xamlFragment in xamlDocument.Fragments())
+                {
+                    Console.Write(xamlFragment + Environment.NewLine);
+                }
             }
         }
     }
